@@ -16,15 +16,19 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSubmit }) => {
       <Input
         label="Phone Number"
         value={phone}
+        textContentType="telephoneNumber"
+        keyboardType="number-pad"
         onChangeText={setPhone}
       />
       <Input
         label="Code"
         value={code}
+        keyboardType="number-pad"
         onChangeText={setCode}
       />
       <Button
         title="Submit"
+        type="clear"
         onPress={() => {
           onSubmit(phone, code);
         }}

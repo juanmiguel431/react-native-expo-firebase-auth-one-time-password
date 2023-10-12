@@ -14,11 +14,14 @@ const SignupForm: React.FC<SignupFormProps> = ({ onSubmit }) => {
       <Text h1>Sign up Form</Text>
       <Input
         label="Phone Number"
+        textContentType="telephoneNumber"
+        keyboardType="number-pad"
         value={phone}
         onChangeText={setPhone}
       />
       <Button
         title="Submit"
+        type="clear"
         onPress={() => {
           onSubmit(phone);
         }}

@@ -1,45 +1,54 @@
-import React from 'react';
-import SignupForm from './components/SignupForm';
-import axios, { AxiosError } from 'axios';
-import LoginForm from './components/LoginForm';
-import { getAuth, signInWithCustomToken } from 'firebase/auth';
+import React, { useContext } from 'react';
+import { createStackNavigator } from '@react-navigation/stack';
+import { RootStackParamList, SCREEN } from './models/screen';
+import SignScreen from './screens/SignScreen';
+import AccountScreen from './screens/AccountScreen';
+import { StatusBar } from 'expo-status-bar';
+import { NavigationContainer } from '@react-navigation/native';
+import { AuthContext } from './context/auth-context';
+import ResolveAuthScreen from './screens/ResolveAuthScreen';
 
-type Response = {
-  token: string;
-}
+const Stack = createStackNavigator<RootStackParamList>();
+
+const LoginFlow: React.FC = () => {
+  return (
+    <Stack.Navigator initialRouteName={SCREEN.Signin}>
+      <Stack.Screen name={SCREEN.Signin} component={SignScreen} options={{ title: 'Login' }}/>
+    </Stack.Navigator>
+  );
+};
+
+const MainFlow: React.FC = () => {
+  return (
+    <Stack.Navigator initialRouteName={SCREEN.Account}>
+      <Stack.Screen name={SCREEN.Account} component={AccountScreen} options={{ title: 'Account' }}/>
+    </Stack.Navigator>
+  );
+};
+
+const resolveAuth = (isSignedIn: boolean | null) => {
+  switch (isSignedIn) {
+    case true:
+      return <Stack.Screen name={SCREEN.MainFlow} component={MainFlow} options={{ headerShown: false }}/>;
+    case false:
+      return <Stack.Screen name={SCREEN.LoginFlow} component={LoginFlow} options={{ headerShown: false }}/>;
+    default:
+      return <Stack.Screen name={SCREEN.ResolveAuth} component={ResolveAuthScreen} options={{ headerShown: false }}/>
+  }
+};
 
 const AppContainer: React.FC = () => {
+  const { isLogin } = useContext(AuthContext);
+
   return (
-    <>
-      <SignupForm
-        onSubmit={async (phone) => {
-          try {
-            await axios.post('https://createuser-jc7q5p2tqq-uc.a.run.app', { phone });
-            await axios.post('https://requestonetimepassword-jc7q5p2tqq-uc.a.run.app', { phone });
-          } catch (e) {
-            if (e instanceof AxiosError) {
-              console.log(e.response?.data);
-            }
-          }
-        }}
-      />
-
-      <LoginForm
-        onSubmit={async (phone, code) => {
-          try {
-            const response = await axios.post('https://verifyonetimepassword-jc7q5p2tqq-uc.a.run.app ', { phone, code });
-            const data = response.data as Response;
-
-            const userCredential = await signInWithCustomToken(getAuth(), data.token);
-
-          } catch (e) {
-            if (e instanceof AxiosError) {
-              console.log(e.response?.data);
-            }
-          }
-        }}
-      />
-    </>
+    <React.Fragment>
+      <StatusBar style="auto"/>
+      <NavigationContainer>
+        <Stack.Navigator>
+          {resolveAuth(isLogin)}
+        </Stack.Navigator>
+      </NavigationContainer>
+    </React.Fragment>
   );
 };
 

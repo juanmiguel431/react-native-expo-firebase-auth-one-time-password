@@ -1,14 +1,12 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet } from 'react-native';
-import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { initializeApp } from 'firebase/app';
-import { useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { initializeAuth, getReactNativePersistence } from 'firebase/auth';
 import ReactNativeAsyncStorage from '@react-native-async-storage/async-storage';
 import AppContainer from './src/AppContainer';
+import { AuthContextProvider } from './src/context/auth-context';
 
-
-export default function App() {
+const App: React.FC = () => {
 
   useEffect(() => {
     // Your web app's Firebase configuration // For Firebase JS SDK v7.20.0 and later, measurementId is optional
@@ -33,20 +31,12 @@ export default function App() {
   }, []);
 
   return (
-    <SafeAreaProvider>
-      <SafeAreaView>
+    <AuthContextProvider>
+      <SafeAreaProvider>
         <AppContainer/>
-        <StatusBar style="auto"/>
-      </SafeAreaView>
-    </SafeAreaProvider>
+      </SafeAreaProvider>
+    </AuthContextProvider>
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
+export default App;
